@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRM LAQ Builder — Word & PDF Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <h1>SRM LAQ Builder</h1>
+            <span class="badge {{ 'ok' if has_template else 'warn' }}">
+                {{ 'template.docx Linked' if has_template else 'Using Default SRM Styling (Add template.docx for custom)' }}
+            </span>
+        </div>
+        <div class="global-settings">
+            <label>
+                Subject Code:
+                <input type="text" id="courseCode" value="ENT" placeholder="e.g. ENT, ECS" />
+            </label>
+            <label>
+                Model:
+                <select id="geminiModel">
+                    <option value="gemini-3-flash-preview" selected>Gemini 3 Flash Preview (Free Tier - Recommended)</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash (Free Tier Backup)</option>
+                    <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash-Lite (Fastest Free Tier)</option>
+                </select>
+            </label>
+            <label>
+                Gemini API Key:
+                <input type="password" id="apiKey" placeholder="Paste AI Studio Key (Optional)" />
+            </label>
+        </div>
+    </header>
+
+    <main class="workspace">
+        <!-- Left Sidebar: Multi-Week Manager -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Weeks Queue</h2>
+                <button id="addWeekBtn" class="btn-secondary">+ Add Week</button>
+            </div>
+            <div class="bulk-init">
+                <input type="number" id="bulkCount" min="1" max="15" placeholder="Total weeks (e.g. 10)" />
+                <button id="bulkCreateBtn" class="btn-outline">Create All</button>
+            </div>
+            <ul id="weekList" class="week-list"></ul>
+        </aside>
+
+        <!-- Main Editor Panel -->
+        <section class="editor">
+            <!-- Smart SRM Portal Paste Box -->
+            <div class="card smart-paste-card">
+                <div class="card-header">
+                    <h3>1. Smart Portal Paste (Auto-Detects Week # & Question)</h3>
+                    <button id="parsePortalBtn" class="btn-outline">Extract Now</button>
+                </div>
+                <textarea id="rawPortalInput" rows="3" placeholder="Paste directly from SRM Portal here (e.g. 'Week 7 - LAQ \n Instructions \n Where can ideas come from...') — It will auto-fill Week # and Question below!"></textarea>
+            </div>
+
+            <!-- Week & Clean Question -->
+            <div class="card">
+                <div class="row">
+                    <div class="field-small">
+                        <label>Week Number</label>
+                        <input type="number" id="weekNumber" min="1" value="7" />
+                    </div>
+                    <div class="field-grow">
+                        <label>Clean Question (Printed in bold at top of PDF)</label>
+                        <textarea id="questionInput" rows="2" placeholder="Enter or auto-extract the LAQ question..."></textarea>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button id="generateApiBtn" class="btn-primary">✨ Auto-Generate with Gemini API (4–5 Pages)</button>
+                    <button id="copyPromptBtn" class="btn-secondary">📋 Copy Master Prompt (For Gemini Pro Web Chat)</button>
+                    <span id="statusMsg" class="status-msg"></span>
+                </div>
+            </div>
+
+            <!-- Answer Editor & Page Estimator -->
+            <div class="card answer-card">
+                <div class="card-header">
+                    <h3>2. Answer Content (Markdown Supported: Headings, Bold, Bullet Lists & Tables)</h3>
+                    <div class="metrics">
+                        <span id="wordCountBadge" class="metric-badge">0 words</span>
+                        <span id="pageEstBadge" class="metric-badge">~0.0 pages (Target: 4–5 pages)</span>
+                    </div>
+                </div>
+                <textarea id="answerInput" rows="16" placeholder="Click 'Auto-Generate with Gemini API' above, OR paste the response from your Gemini Pro web chat here..."></textarea>
+
+                <div class="export-bar">
+                    <button id="exportBtn" class="btn-success">📄 Generate Word (.docx) & PDF for This Week</button>
+                    <div id="downloadLinks" class="download-links"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
